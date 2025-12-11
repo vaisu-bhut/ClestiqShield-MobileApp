@@ -58,7 +58,7 @@ export const AppDetailsScreen = () => {
         <View style={styles.card}>
             <View style={styles.cardHeader}>
                 <View style={styles.keyIcon}>
-                    <Key size={20} color="#4f46e5" />
+                    <Key size={20} color="#849bff" />
                 </View>
                 <View style={styles.keyInfo}>
                     <Text style={styles.keyName}>{item.name}</Text>

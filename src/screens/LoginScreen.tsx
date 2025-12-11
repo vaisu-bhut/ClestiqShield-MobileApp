@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-import { ShieldCheck } from 'lucide-react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { api } from '../services/api';
 
@@ -43,7 +42,11 @@ export const LoginScreen = ({ onLogin }: { onLogin: () => void }) => {
     return (
         <View style={styles.container}>
             <View style={styles.logoContainer}>
-                <ShieldCheck size={80} color="#4f46e5" />
+                <Image
+                    source={require('../../assets/icon.png')}
+                    style={styles.logo}
+                    resizeMode="contain"
+                />
                 <Text style={styles.appName}>Clestiq Shield</Text>
             </View>
 
@@ -89,6 +92,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 40,
     },
+    logo: {
+        width: 100,
+        height: 100,
+        borderRadius: 20,
+    },
     appName: {
         fontSize: 28,
         fontWeight: 'bold',
@@ -109,11 +117,11 @@ const styles = StyleSheet.create({
         fontSize: 16,
     },
     button: {
-        backgroundColor: '#4f46e5',
+        backgroundColor: '#849bff',
         padding: 16,
         borderRadius: 12,
         alignItems: 'center',
-        shadowColor: '#4f46e5',
+        shadowColor: '#849bff',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 8,

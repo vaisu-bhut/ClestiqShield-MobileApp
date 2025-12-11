@@ -126,6 +126,20 @@ class ApiService {
         return this.handleResponse(response);
     }
 
+    async deleteAccount() {
+        const headers = await this.getHeaders();
+        const response = await fetch(`${API_BASE_URL}/users/account-closure`, {
+            method: 'DELETE',
+            headers,
+        });
+        // We don't return JSON here because it might be 204 No Content
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText || 'Failed to delete account');
+        }
+        return true;
+    }
+
     async logout() {
         await AsyncStorage.removeItem('auth_token');
         await AsyncStorage.removeItem('user_id');

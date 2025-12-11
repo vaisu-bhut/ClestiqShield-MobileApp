@@ -53,7 +53,7 @@ const MainNavigator = ({ onLogout }: { onLogout: () => void }) => (
     <Tab.Navigator
         screenOptions={{
             headerShown: false,
-            tabBarActiveTintColor: '#4f46e5',
+            tabBarActiveTintColor: '#849bff',
             tabBarInactiveTintColor: '#9ca3af',
             tabBarStyle: {
                 borderTopWidth: 0,

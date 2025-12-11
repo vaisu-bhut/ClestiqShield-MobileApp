@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Switch, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Switch, TouchableOpacity, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Bell, Volume2, User, LogOut, Zap } from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -47,7 +47,7 @@ export const ProfileScreen = ({ onLogout }: { onLogout: () => void }) => {
             <View style={styles.header}>
                 <View style={styles.avatarContainer}>
                     <View style={styles.avatar}>
-                        <User size={40} color="#4f46e5" />
+                        <User size={40} color="#849bff" />
                     </View>
                     <View>
                         <Text style={styles.name}>{user ? (user.name || user.email) : 'Loading...'}</Text>
@@ -62,7 +62,7 @@ export const ProfileScreen = ({ onLogout }: { onLogout: () => void }) => {
                 <View style={styles.row}>
                     <View style={styles.rowLeft}>
                         <View style={[styles.iconBox, { backgroundColor: '#e0e7ff' }]}>
-                            <Bell size={20} color="#4f46e5" />
+                            <Bell size={20} color="#849bff" />
                         </View>
                         <Text style={styles.rowLabel}>Error Notifications</Text>
                     </View>
@@ -70,7 +70,7 @@ export const ProfileScreen = ({ onLogout }: { onLogout: () => void }) => {
                         value={notifications}
                         onValueChange={setNotifications}
                         trackColor={{ false: '#d1d5db', true: '#818cf8' }}
-                        thumbColor={notifications ? '#4f46e5' : '#f3f4f6'}
+                        thumbColor={notifications ? '#849bff' : '#f3f4f6'}
                     />
                 </View>
 
@@ -85,7 +85,7 @@ export const ProfileScreen = ({ onLogout }: { onLogout: () => void }) => {
                         value={sound}
                         onValueChange={setSound}
                         trackColor={{ false: '#d1d5db', true: '#818cf8' }}
-                        thumbColor={sound ? '#4f46e5' : '#f3f4f6'}
+                        thumbColor={sound ? '#849bff' : '#f3f4f6'}
                     />
                 </View>
 
@@ -100,7 +100,7 @@ export const ProfileScreen = ({ onLogout }: { onLogout: () => void }) => {
                         value={vibration}
                         onValueChange={setVibration}
                         trackColor={{ false: '#d1d5db', true: '#818cf8' }}
-                        thumbColor={vibration ? '#4f46e5' : '#f3f4f6'}
+                        thumbColor={vibration ? '#849bff' : '#f3f4f6'}
                     />
                 </View>
             </View>
@@ -108,6 +108,31 @@ export const ProfileScreen = ({ onLogout }: { onLogout: () => void }) => {
             <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
                 <LogOut size={20} color="#ef4444" />
                 <Text style={styles.logoutText}>Log Out</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={[styles.logoutButton, { marginTop: 12, backgroundColor: '#fee2e2' }]} onPress={() => {
+                Alert.alert(
+                    'Delete Account',
+                    'Are you sure you want to delete your account? This action cannot be undone.',
+                    [
+                        { text: 'Cancel', style: 'cancel' },
+                        {
+                            text: 'Delete',
+                            style: 'destructive',
+                            onPress: async () => {
+                                try {
+                                    await api.deleteAccount();
+                                    await onLogout();
+                                } catch (error) {
+                                    Alert.alert('Error', 'Failed to delete account');
+                                }
+                            }
+                        }
+                    ]
+                );
+            }}>
+                <LogOut size={20} color="#ef4444" />
+                <Text style={styles.logoutText}>Delete Account</Text>
             </TouchableOpacity>
         </SafeAreaView>
     );
