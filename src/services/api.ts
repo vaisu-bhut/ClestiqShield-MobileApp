@@ -79,6 +79,16 @@ class ApiService {
         return this.handleResponse(response);
     }
 
+    async updateProfile(data: { full_name?: string; is_active?: boolean }) {
+        const headers = await this.getHeaders();
+        const response = await fetch(`${API_BASE_URL}/users/`, {
+            method: 'PATCH',
+            headers,
+            body: JSON.stringify(data),
+        });
+        return this.handleResponse(response);
+    }
+
     async getApps() {
         const headers = await this.getHeaders();
         const response = await fetch(`${API_BASE_URL}/apps/`, {
@@ -94,6 +104,16 @@ class ApiService {
             method: 'POST',
             headers,
             body: JSON.stringify({ name, description }),
+        });
+        return this.handleResponse(response);
+    }
+
+    async updateApp(appId: string, data: { name?: string; description?: string }) {
+        const headers = await this.getHeaders();
+        const response = await fetch(`${API_BASE_URL}/apps/${appId}`, {
+            method: 'PATCH',
+            headers,
+            body: JSON.stringify(data),
         });
         return this.handleResponse(response);
     }
@@ -122,6 +142,24 @@ class ApiService {
             method: 'POST',
             headers,
             body: JSON.stringify({ name }),
+        });
+        return this.handleResponse(response);
+    }
+
+    async deleteApp(appId: string) {
+        const headers = await this.getHeaders();
+        const response = await fetch(`${API_BASE_URL}/apps/${appId}`, {
+            method: 'DELETE',
+            headers,
+        });
+        return this.handleResponse(response);
+    }
+
+    async revokeApiKey(appId: string, keyId: string) {
+        const headers = await this.getHeaders();
+        const response = await fetch(`${API_BASE_URL}/apps/${appId}/keys/${keyId}`, {
+            method: 'DELETE',
+            headers,
         });
         return this.handleResponse(response);
     }

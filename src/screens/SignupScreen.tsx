@@ -1,37 +1,38 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
 import { api } from '../services/api';
-
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../navigation/AppNavigator';
 
-type LoginScreenNavigationProp = NativeStackNavigationProp<AuthStackParamList, 'Login'>;
+type SignupScreenNavigationProp = NativeStackNavigationProp<AuthStackParamList, 'Signup'>;
 
-export const LoginScreen = ({ onLogin }: { onLogin: () => void }) => {
-    const navigation = useNavigation<LoginScreenNavigationProp>();
+export const SignupScreen = () => {
+    const navigation = useNavigation<SignupScreenNavigationProp>();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
 
-    const handleLogin = async () => {
+    const handleSignup = async () => {
+        if (!email || !password || !confirmPassword) {
+            setError('Please fill in all fields');
+            return;
+        }
+        if (password !== confirmPassword) {
+            setError('Passwords do not match');
+            return;
+        }
+
         try {
             setLoading(true);
             setError('');
-            const data = await api.login(username, password);
-            await AsyncStorage.setItem('auth_token', data.access_token);
-            await AsyncStorage.setItem('user_email', username);
-
-            // Backend now returns user_id directly
-            if (data.user_id) {
-                await AsyncStorage.setItem('user_id', String(data.user_id));
-            }
-
-            onLogin();
+            await api.signup(email, password);
+            Alert.alert('Success', 'Account created successfully! Please login.');
+            navigation.navigate('Login');
         } catch (err: any) {
-            setError(err.message || 'Login failed');
+            setError(err.message || 'Signup failed');
         } finally {
             setLoading(false);
         }
@@ -46,6 +47,7 @@ export const LoginScreen = ({ onLogin }: { onLogin: () => void }) => {
                     resizeMode="contain"
                 />
                 <Text style={styles.appName}>Clestiq Shield</Text>
+                <Text style={styles.subtitle}>Create an Account</Text>
             </View>
 
             <View style={styles.form}>
@@ -53,9 +55,10 @@ export const LoginScreen = ({ onLogin }: { onLogin: () => void }) => {
                     placeholder="Email"
                     style={styles.input}
                     placeholderTextColor="#9ca3af"
-                    value={username}
-                    onChangeText={setUsername}
+                    value={email}
+                    onChangeText={setEmail}
                     autoCapitalize="none"
+                    keyboardType="email-address"
                 />
                 <TextInput
                     placeholder="Password"
@@ -65,17 +68,25 @@ export const LoginScreen = ({ onLogin }: { onLogin: () => void }) => {
                     value={password}
                     onChangeText={setPassword}
                 />
+                <TextInput
+                    placeholder="Confirm Password"
+                    secureTextEntry
+                    style={styles.input}
+                    placeholderTextColor="#9ca3af"
+                    value={confirmPassword}
+                    onChangeText={setConfirmPassword}
+                />
                 {error ? <Text style={styles.errorText}>{error}</Text> : null}
                 <TouchableOpacity
                     style={[styles.button, loading && styles.buttonDisabled]}
-                    onPress={handleLogin}
+                    onPress={handleSignup}
                     disabled={loading}
                 >
-                    <Text style={styles.buttonText}>{loading ? 'Logging in...' : 'Login'}</Text>
+                    <Text style={styles.buttonText}>{loading ? 'Creating Account...' : 'Sign Up'}</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity onPress={() => navigation.navigate('Signup')} style={styles.linkButton}>
-                    <Text style={styles.linkText}>Don't have an account? Sign Up</Text>
+                <TouchableOpacity onPress={() => navigation.navigate('Login')} style={styles.linkButton}>
+                    <Text style={styles.linkText}>Already have an account? Login</Text>
                 </TouchableOpacity>
             </View>
         </View>
@@ -95,15 +106,20 @@ const styles = StyleSheet.create({
         marginBottom: 40,
     },
     logo: {
-        width: 100,
-        height: 100,
-        borderRadius: 20,
+        width: 80,
+        height: 80,
+        borderRadius: 16,
     },
     appName: {
-        fontSize: 28,
+        fontSize: 24,
         fontWeight: 'bold',
         color: '#111827',
         marginTop: 10,
+    },
+    subtitle: {
+        fontSize: 16,
+        color: '#6b7280',
+        marginTop: 4,
     },
     form: {
         width: '100%',
@@ -127,6 +143,7 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 8,
+        marginTop: 8,
     },
     buttonText: {
         color: 'white',

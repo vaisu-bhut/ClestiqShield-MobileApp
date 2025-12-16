@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Modal, TextInput, ActivityIndicator, Alert, Clipboard } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Key, Trash2, ArrowLeft, Copy, Plus, X } from 'lucide-react-native';
+import { ActionSheetIOS, Platform } from 'react-native'; // Optional if needed for better alerts? standard Alert is fine
+import { Key, Trash2, ArrowLeft, Copy, Plus, X, Edit2 } from 'lucide-react-native';
 import { api } from '../services/api';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { useEffect, useState } from 'react';
 
 export const AppDetailsScreen = () => {
     const route = useRoute<any>();
@@ -13,13 +14,33 @@ export const AppDetailsScreen = () => {
     const [keys, setKeys] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [modalVisible, setModalVisible] = useState(false);
+
     const [newKeyName, setNewKeyName] = useState('');
     const [creating, setCreating] = useState(false);
     const [createdKeySecret, setCreatedKeySecret] = useState<string | null>(null);
 
+    // Edit App State
+    const [editModalVisible, setEditModalVisible] = useState(false);
+    const [editName, setEditName] = useState(appName);
+    const [editDesc, setEditDesc] = useState(''); // Not initially loaded, might need to fetch details first if description needed
+    const [updatingApp, setUpdatingApp] = useState(false);
+    const [currentAppDetails, setCurrentAppDetails] = useState<any>(null);
+
     useEffect(() => {
         loadKeys();
+        loadAppDetails();
     }, []);
+
+    const loadAppDetails = async () => {
+        try {
+            const details = await api.getAppDetails(appId);
+            setCurrentAppDetails(details);
+            setEditName(details.name);
+            setEditDesc(details.description || '');
+        } catch (e) {
+            console.error(e);
+        }
+    };
 
     const loadKeys = async () => {
         try {
@@ -48,6 +69,67 @@ export const AppDetailsScreen = () => {
             setCreating(false);
         }
     };
+    const handleUpdateApp = async () => {
+        try {
+            setUpdatingApp(true);
+            const updated = await api.updateApp(appId, { name: editName, description: editDesc });
+            setCurrentAppDetails(updated);
+            setEditModalVisible(false);
+            Alert.alert('Success', 'Application updated');
+            // Optimistically update header title? Or navigation params?
+            // navigation.setParams({ appName: editName }); // Requires navigation prop type adjustment
+        } catch (error: any) {
+            Alert.alert('Error', error.message || 'Failed to update app');
+        } finally {
+            setUpdatingApp(false);
+        }
+    };
+
+    const handleDeleteApp = () => {
+        Alert.alert(
+            'Delete Application',
+            'Are you sure you want to delete this application? This action cannot be undone.',
+            [
+                { text: 'Cancel', style: 'cancel' },
+                {
+                    text: 'Delete',
+                    style: 'destructive',
+                    onPress: async () => {
+                        try {
+                            await api.deleteApp(appId);
+                            Alert.alert('Success', 'Application deleted');
+                            navigation.goBack();
+                        } catch (error: any) {
+                            Alert.alert('Error', error.message || 'Failed to delete app');
+                        }
+                    }
+                }
+            ]
+        );
+    };
+
+    const handleRevokeKey = (keyId: string) => {
+        Alert.alert(
+            'Revoke API Key',
+            'Are you sure you want to revoke this key? This action cannot be undone.',
+            [
+                { text: 'Cancel', style: 'cancel' },
+                {
+                    text: 'Revoke',
+                    style: 'destructive',
+                    onPress: async () => {
+                        try {
+                            await api.revokeApiKey(appId, keyId);
+                            loadKeys();
+                            Alert.alert('Revoked', 'API Key has been revoked');
+                        } catch (error: any) {
+                            Alert.alert('Error', error.message || 'Failed to revoke key');
+                        }
+                    }
+                }
+            ]
+        );
+    };
 
     const copyToClipboard = (text: string) => {
         Clipboard.setString(text);
@@ -64,7 +146,9 @@ export const AppDetailsScreen = () => {
                     <Text style={styles.keyName}>{item.name}</Text>
                     <Text style={styles.keyPrefix}>Prefix: {item.key_prefix}...</Text>
                 </View>
-                {/* Delete button could go here */}
+                <TouchableOpacity onPress={() => handleRevokeKey(item.id)} style={styles.revokeButton}>
+                    <Trash2 size={20} color="#ef4444" />
+                </TouchableOpacity>
             </View>
         </View>
     );
@@ -75,8 +159,10 @@ export const AppDetailsScreen = () => {
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
                     <ArrowLeft size={24} color="#111827" />
                 </TouchableOpacity>
-                <Text style={styles.title}>{appName}</Text>
-                <View style={{ width: 40 }} />
+                <Text style={styles.title}>{currentAppDetails ? currentAppDetails.name : appName}</Text>
+                <TouchableOpacity onPress={() => setEditModalVisible(true)} style={styles.backButton}>
+                    <Edit2 size={24} color="#4f46e5" />
+                </TouchableOpacity>
             </View>
 
             <View style={styles.sectionHeader}>
@@ -105,16 +191,23 @@ export const AppDetailsScreen = () => {
                 />
             )}
 
+            <View style={styles.deleteContainer}>
+                <TouchableOpacity style={styles.deleteButton} onPress={handleDeleteApp}>
+                    <Trash2 size={20} color="white" />
+                    <Text style={styles.deleteButtonText}>Delete Application</Text>
+                </TouchableOpacity>
+            </View>
+
             <Modal
-                animationType="fade"
+                animationType="slide"
                 transparent={true}
                 visible={modalVisible}
                 onRequestClose={() => {
                     if (!createdKeySecret) setModalVisible(false);
                 }}
             >
-                <View style={styles.modalView}>
-                    <View style={styles.modalContent}>
+                <View style={styles.modalOverlay}>
+                    <View style={styles.bottomSheet}>
                         {createdKeySecret ? (
                             <>
                                 <View style={styles.successHeader}>
@@ -173,7 +266,49 @@ export const AppDetailsScreen = () => {
                     </View>
                 </View>
             </Modal>
-        </SafeAreaView>
+
+            {/* Edit App Modal */}
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={editModalVisible}
+                onRequestClose={() => setEditModalVisible(false)}
+            >
+                <View style={styles.modalOverlay}>
+                    <View style={styles.bottomSheet}>
+                        <View style={styles.modalHeader}>
+                            <Text style={styles.modalTitle}>Edit Application</Text>
+                            <TouchableOpacity onPress={() => setEditModalVisible(false)} style={styles.closeButton}>
+                                <X size={24} color="#6b7280" />
+                            </TouchableOpacity>
+                        </View>
+
+                        <Text style={styles.inputLabel}>App Name</Text>
+                        <TextInput
+                            style={styles.input}
+                            value={editName}
+                            onChangeText={setEditName}
+                        />
+
+                        <Text style={styles.inputLabel}>Description</Text>
+                        <TextInput
+                            style={[styles.input, { height: 100, textAlignVertical: 'top' }]}
+                            value={editDesc}
+                            onChangeText={setEditDesc}
+                            multiline
+                        />
+
+                        <TouchableOpacity
+                            style={[styles.createButton, updatingApp && styles.disabled]}
+                            onPress={handleUpdateApp}
+                            disabled={updatingApp}
+                        >
+                            <Text style={styles.createButtonText}>{updatingApp ? 'Updating...' : 'Save Changes'}</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+        </SafeAreaView >
     );
 };
 
@@ -275,21 +410,43 @@ const styles = StyleSheet.create({
         fontSize: 14,
         textAlign: 'center',
     },
-    modalView: {
+    modalOverlay: {
         flex: 1,
-        justifyContent: 'center',
+        justifyContent: 'flex-end',
         backgroundColor: 'rgba(0,0,0,0.5)',
-        padding: 20,
     },
-    modalContent: {
+    bottomSheet: {
         backgroundColor: 'white',
-        borderRadius: 24,
+        borderTopLeftRadius: 24,
+        borderTopRightRadius: 24,
         padding: 24,
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
+        shadowOffset: { width: 0, height: -4 },
         shadowOpacity: 0.1,
         shadowRadius: 12,
         elevation: 10,
+        minHeight: 300,
+    },
+    closeButton: {
+        padding: 4,
+    },
+    deleteContainer: {
+        padding: 20,
+        paddingTop: 0,
+    },
+    deleteButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#ef4444',
+        padding: 16,
+        borderRadius: 12,
+        gap: 8,
+    },
+    deleteButtonText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: 'bold',
     },
     modalHeader: {
         flexDirection: 'row',
@@ -364,5 +521,15 @@ const styles = StyleSheet.create({
         color: 'white',
         fontSize: 16,
         fontWeight: 'bold',
+    },
+
+    revokeButton: {
+        padding: 8,
+    },
+    inputLabel: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: '#374151',
+        marginBottom: 8,
     },
 });
