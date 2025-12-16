@@ -62,7 +62,7 @@ export const AppsScreen = () => {
             onPress={() => navigation.navigate('AppDetails' as any, { appId: item.id, appName: item.name })}
         >
             <View style={styles.cardIcon}>
-                <Box size={24} color="#4f46e5" />
+                <Box size={24} color="#849bff" />
             </View>
             <View style={styles.cardContent}>
                 <Text style={styles.cardTitle}>{item.name}</Text>

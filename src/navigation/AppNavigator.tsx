@@ -2,6 +2,7 @@ import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { LoginScreen } from '../screens/LoginScreen';
+import { SignupScreen } from '../screens/SignupScreen';
 import { DashboardScreen } from '../screens/DashboardScreen';
 import { ProfileScreen } from '../screens/ProfileScreen';
 import { AppsScreen } from '../screens/AppsScreen';
@@ -15,6 +16,7 @@ export type RootStackParamList = {
 
 export type AuthStackParamList = {
     Login: undefined;
+    Signup: undefined;
 };
 
 export type MainTabParamList = {
@@ -46,6 +48,7 @@ const AuthNavigator = ({ onLogin }: { onLogin: () => void }) => (
         <AuthStack.Screen name="Login">
             {props => <LoginScreen {...props} onLogin={onLogin} />}
         </AuthStack.Screen>
+        <AuthStack.Screen name="Signup" component={SignupScreen} />
     </AuthStack.Navigator>
 );
 
@@ -53,7 +56,7 @@ const MainNavigator = ({ onLogout }: { onLogout: () => void }) => (
     <Tab.Navigator
         screenOptions={{
             headerShown: false,
-            tabBarActiveTintColor: '#4f46e5',
+            tabBarActiveTintColor: '#849bff',
             tabBarInactiveTintColor: '#9ca3af',
             tabBarStyle: {
                 borderTopWidth: 0,

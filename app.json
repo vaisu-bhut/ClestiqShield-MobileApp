@@ -1,8 +1,8 @@
 {
   "expo": {
     "name": "ClestiqShield-MobileApp",
-    "slug": "ClestiqShield-MobileApp",
-    "version": "1.0.0",
+    "slug": "clestiq-shield",
+    "version": "2.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -12,19 +12,22 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "ios": {
-      "supportsTablet": true
-    },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
+      "versionCode": 2,
+      "version": "2.0.0",
+      "package": "com.clestiq.shield.app",
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
     },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    }
+    "extra": {
+      "eas": {
+        "projectId": "48446ea0-8f65-46da-b6e5-acfe50b379dc"
+      }
+    },
+    "owner": "vasubhut157"
   }
 }
