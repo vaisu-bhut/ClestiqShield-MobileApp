@@ -1,12 +1,14 @@
 import React from 'react';
-import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, StatusBar } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MetricCard } from '../components/MetricCard';
 import { mockMetrics, mockApps } from '../data/mockMetrics';
+import { colors } from '../styles/colors';
 
 export const DashboardScreen = () => {
     return (
         <SafeAreaView style={styles.container} edges={['top']}>
+            <StatusBar barStyle="light-content" backgroundColor={colors.background} />
             <ScrollView contentContainerStyle={styles.scrollContent}>
                 <View style={styles.header}>
                     <Text style={styles.welcome}>Welcome back,</Text>
@@ -25,7 +27,7 @@ export const DashboardScreen = () => {
                     {mockApps.map((app) => (
                         <View key={app.id} style={styles.appRow}>
                             <View style={styles.appInfo}>
-                                <View style={[styles.statusDot, { backgroundColor: app.status === 'running' ? '#10b981' : app.status === 'error' ? '#ef4444' : '#9ca3af' }]} />
+                                <View style={[styles.statusDot, { backgroundColor: app.status === 'running' ? colors.success : app.status === 'error' ? colors.error : colors.mutedForeground }]} />
                                 <Text style={styles.appName}>{app.name}</Text>
                             </View>
                             <Text style={styles.uptime}>{app.uptime}</Text>
@@ -40,7 +42,7 @@ export const DashboardScreen = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f9fafb',
+        backgroundColor: colors.background,
     },
     scrollContent: {
         padding: 20,
@@ -50,17 +52,17 @@ const styles = StyleSheet.create({
     },
     welcome: {
         fontSize: 16,
-        color: '#6b7280',
+        color: colors.mutedForeground,
     },
     user: {
         fontSize: 24,
         fontWeight: 'bold',
-        color: '#111827',
+        color: colors.foreground,
     },
     sectionTitle: {
         fontSize: 18,
         fontWeight: '600',
-        color: '#374151',
+        color: colors.mutedForeground,
         marginBottom: 16,
         marginTop: 8,
     },
@@ -68,13 +70,11 @@ const styles = StyleSheet.create({
         marginBottom: 24,
     },
     appsList: {
-        backgroundColor: 'white',
+        backgroundColor: colors.card,
         borderRadius: 16,
         padding: 16,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.05,
-        shadowRadius: 4,
+        borderWidth: 1,
+        borderColor: colors.border,
     },
     appRow: {
         flexDirection: 'row',
@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingVertical: 12,
         borderBottomWidth: 1,
-        borderBottomColor: '#f3f4f6',
+        borderBottomColor: colors.border,
     },
     appInfo: {
         flexDirection: 'row',
@@ -97,10 +97,10 @@ const styles = StyleSheet.create({
     appName: {
         fontSize: 15,
         fontWeight: '500',
-        color: '#1f2937',
+        color: colors.foreground,
     },
     uptime: {
         fontSize: 13,
-        color: '#6b7280',
+        color: colors.mutedForeground,
     },
 });

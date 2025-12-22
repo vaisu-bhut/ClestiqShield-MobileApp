@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Switch, TouchableOpacity, Alert, Modal, TextInput } from 'react-native';
+import { View, Text, StyleSheet, Switch, TouchableOpacity, Alert, Modal, TextInput, StatusBar } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Bell, Volume2, User, LogOut, Zap, Edit2, X } from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { api } from '../services/api';
+import { colors } from '../styles/colors';
 
 export const ProfileScreen = ({ onLogout }: { onLogout: () => void }) => {
     const [notifications, setNotifications] = useState(true);
@@ -69,17 +70,18 @@ export const ProfileScreen = ({ onLogout }: { onLogout: () => void }) => {
 
     return (
         <SafeAreaView style={styles.container} edges={['top']}>
+            <StatusBar barStyle="light-content" backgroundColor={colors.background} />
             <View style={styles.header}>
                 <View style={styles.avatarContainer}>
                     <View style={styles.avatar}>
-                        <User size={40} color="#849bff" />
+                        <User size={40} color={colors.primary} />
                     </View>
                     <View style={{ flex: 1 }}>
                         <Text style={styles.name}>{user ? (user.full_name || user.name || user.email) : 'Loading...'}</Text>
                         <Text style={styles.role}>{user ? 'User' : '...'}</Text>
                     </View>
                     <TouchableOpacity onPress={openEditModal} style={styles.editButton}>
-                        <Edit2 size={20} color="#4f46e5" />
+                        <Edit2 size={20} color={colors.primary} />
                     </TouchableOpacity>
                 </View>
             </View>
@@ -89,22 +91,22 @@ export const ProfileScreen = ({ onLogout }: { onLogout: () => void }) => {
 
                 <View style={styles.row}>
                     <View style={styles.rowLeft}>
-                        <View style={[styles.iconBox, { backgroundColor: '#e0e7ff' }]}>
-                            <Bell size={20} color="#849bff" />
+                        <View style={[styles.iconBox, { backgroundColor: 'rgba(16, 185, 129, 0.1)' }]}>
+                            <Bell size={20} color={colors.primary} />
                         </View>
                         <Text style={styles.rowLabel}>Error Notifications</Text>
                     </View>
                     <Switch
                         value={notifications}
                         onValueChange={setNotifications}
-                        trackColor={{ false: '#d1d5db', true: '#818cf8' }}
-                        thumbColor={notifications ? '#849bff' : '#f3f4f6'}
+                        trackColor={{ false: colors.mutedForeground, true: colors.green[400] }}
+                        thumbColor={notifications ? colors.primary : colors.foreground}
                     />
                 </View>
 
                 <View style={styles.row}>
                     <View style={styles.rowLeft}>
-                        <View style={[styles.iconBox, { backgroundColor: '#dcfce7' }]}>
+                        <View style={[styles.iconBox, { backgroundColor: 'rgba(22, 163, 74, 0.1)' }]}>
                             <Volume2 size={20} color="#16a34a" />
                         </View>
                         <Text style={styles.rowLabel}>Sound</Text>
@@ -112,14 +114,14 @@ export const ProfileScreen = ({ onLogout }: { onLogout: () => void }) => {
                     <Switch
                         value={sound}
                         onValueChange={setSound}
-                        trackColor={{ false: '#d1d5db', true: '#818cf8' }}
-                        thumbColor={sound ? '#849bff' : '#f3f4f6'}
+                        trackColor={{ false: colors.mutedForeground, true: colors.green[400] }}
+                        thumbColor={sound ? colors.primary : colors.foreground}
                     />
                 </View>
 
                 <View style={styles.row}>
                     <View style={styles.rowLeft}>
-                        <View style={[styles.iconBox, { backgroundColor: '#fef3c7' }]}>
+                        <View style={[styles.iconBox, { backgroundColor: 'rgba(217, 119, 6, 0.1)' }]}>
                             <Zap size={20} color="#d97706" />
                         </View>
                         <Text style={styles.rowLabel}>Vibration</Text>
@@ -127,18 +129,18 @@ export const ProfileScreen = ({ onLogout }: { onLogout: () => void }) => {
                     <Switch
                         value={vibration}
                         onValueChange={setVibration}
-                        trackColor={{ false: '#d1d5db', true: '#818cf8' }}
-                        thumbColor={vibration ? '#849bff' : '#f3f4f6'}
+                        trackColor={{ false: colors.mutedForeground, true: colors.green[400] }}
+                        thumbColor={vibration ? colors.primary : colors.foreground}
                     />
                 </View>
             </View>
 
             <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-                <LogOut size={20} color="#ef4444" />
+                <LogOut size={20} color={colors.error} />
                 <Text style={styles.logoutText}>Log Out</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={[styles.logoutButton, { marginTop: 12, backgroundColor: '#fee2e2' }]} onPress={() => {
+            <TouchableOpacity style={[styles.logoutButton, { marginTop: 12, backgroundColor: 'rgba(239, 68, 68, 0.1)' }]} onPress={() => {
                 Alert.alert(
                     'Delete Account',
                     'Are you sure you want to delete your account? This action cannot be undone.',
@@ -159,7 +161,7 @@ export const ProfileScreen = ({ onLogout }: { onLogout: () => void }) => {
                     ]
                 );
             }}>
-                <LogOut size={20} color="#ef4444" />
+                <LogOut size={20} color={colors.error} />
                 <Text style={styles.logoutText}>Delete Account</Text>
             </TouchableOpacity>
 
@@ -175,7 +177,7 @@ export const ProfileScreen = ({ onLogout }: { onLogout: () => void }) => {
                         <View style={styles.modalHeader}>
                             <Text style={styles.modalTitle}>Edit Profile</Text>
                             <TouchableOpacity onPress={() => setEditModalVisible(false)}>
-                                <X size={24} color="#6b7280" />
+                                <X size={24} color={colors.mutedForeground} />
                             </TouchableOpacity>
                         </View>
 
@@ -185,6 +187,7 @@ export const ProfileScreen = ({ onLogout }: { onLogout: () => void }) => {
                             value={editName}
                             onChangeText={setEditName}
                             autoCapitalize="words"
+                            placeholderTextColor={colors.mutedForeground}
                         />
 
                         <TouchableOpacity
@@ -204,7 +207,7 @@ export const ProfileScreen = ({ onLogout }: { onLogout: () => void }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f9fafb',
+        backgroundColor: colors.background,
         padding: 20,
     },
     header: {
@@ -220,33 +223,31 @@ const styles = StyleSheet.create({
         width: 64,
         height: 64,
         borderRadius: 32,
-        backgroundColor: '#e0e7ff',
+        backgroundColor: 'rgba(16, 185, 129, 0.1)',
         justifyContent: 'center',
         alignItems: 'center',
     },
     name: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: '#111827',
+        color: colors.foreground,
     },
     role: {
         fontSize: 14,
-        color: '#6b7280',
+        color: colors.mutedForeground,
     },
     section: {
-        backgroundColor: 'white',
+        backgroundColor: colors.card,
         borderRadius: 16,
         padding: 16,
         marginBottom: 24,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.05,
-        shadowRadius: 4,
+        borderWidth: 1,
+        borderColor: colors.border,
     },
     sectionTitle: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#6b7280',
+        color: colors.mutedForeground,
         marginBottom: 16,
         textTransform: 'uppercase',
         letterSpacing: 0.5,
@@ -257,7 +258,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingVertical: 12,
         borderBottomWidth: 1,
-        borderBottomColor: '#f3f4f6',
+        borderBottomColor: colors.border,
     },
     rowLeft: {
         flexDirection: 'row',
@@ -273,7 +274,7 @@ const styles = StyleSheet.create({
     },
     rowLabel: {
         fontSize: 16,
-        color: '#1f2937',
+        color: colors.foreground,
         fontWeight: '500',
     },
     logoutButton: {
@@ -282,17 +283,17 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         gap: 8,
         padding: 16,
-        backgroundColor: '#fee2e2',
+        backgroundColor: 'rgba(239, 68, 68, 0.1)',
         borderRadius: 12,
     },
     logoutText: {
         fontSize: 16,
         fontWeight: '600',
-        color: '#ef4444',
+        color: colors.error,
     },
     editButton: {
         padding: 8,
-        backgroundColor: '#e0e7ff',
+        backgroundColor: 'rgba(16, 185, 129, 0.1)',
         borderRadius: 20,
     },
     modalView: {
@@ -301,7 +302,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.5)',
     },
     modalContent: {
-        backgroundColor: 'white',
+        backgroundColor: colors.richBlack,
         borderTopLeftRadius: 24,
         borderTopRightRadius: 24,
         padding: 24,
@@ -310,6 +311,10 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 12,
         elevation: 10,
+        borderTopWidth: 1,
+        borderLeftWidth: 1,
+        borderRightWidth: 1,
+        borderColor: colors.border,
     },
     modalHeader: {
         flexDirection: 'row',
@@ -320,24 +325,26 @@ const styles = StyleSheet.create({
     modalTitle: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: '#111827',
+        color: colors.foreground,
     },
     inputLabel: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#374151',
+        color: colors.mutedForeground,
         marginBottom: 8,
     },
     input: {
-        backgroundColor: '#f3f4f6',
+        backgroundColor: colors.input,
         padding: 16,
         borderRadius: 12,
         marginBottom: 24,
         fontSize: 16,
-        color: '#1f2937',
+        color: colors.foreground,
+        borderWidth: 1,
+        borderColor: colors.border,
     },
     saveButton: {
-        backgroundColor: '#4f46e5',
+        backgroundColor: colors.primary,
         padding: 16,
         borderRadius: 12,
         alignItems: 'center',

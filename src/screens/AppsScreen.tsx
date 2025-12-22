@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Modal, TextInput, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Modal, TextInput, ActivityIndicator, StatusBar } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Plus, Box, ChevronRight, X } from 'lucide-react-native';
 import { api } from '../services/api';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { colors } from '../styles/colors';
 
 type AppsStackParamList = {
     AppDetails: { appId: string; appName: string };
@@ -62,18 +63,19 @@ export const AppsScreen = () => {
             onPress={() => navigation.navigate('AppDetails' as any, { appId: item.id, appName: item.name })}
         >
             <View style={styles.cardIcon}>
-                <Box size={24} color="#849bff" />
+                <Box size={24} color={colors.primary} />
             </View>
             <View style={styles.cardContent}>
                 <Text style={styles.cardTitle}>{item.name}</Text>
                 <Text style={styles.cardDesc} numberOfLines={1}>{item.description || 'No description'}</Text>
             </View>
-            <ChevronRight size={20} color="#9ca3af" />
+            <ChevronRight size={20} color={colors.mutedForeground} />
         </TouchableOpacity>
     );
 
     return (
         <SafeAreaView style={styles.container} edges={['top']}>
+            <StatusBar barStyle="light-content" backgroundColor={colors.background} />
             <View style={styles.header}>
                 <Text style={styles.title}>My Apps</Text>
                 <TouchableOpacity style={styles.addButton} onPress={() => setModalVisible(true)}>
@@ -83,7 +85,7 @@ export const AppsScreen = () => {
 
             {loading && apps.length === 0 ? (
                 <View style={styles.center}>
-                    <ActivityIndicator size="large" color="#4f46e5" />
+                    <ActivityIndicator size="large" color={colors.primary} />
                 </View>
             ) : (
                 <FlatList
@@ -110,19 +112,21 @@ export const AppsScreen = () => {
                         <View style={styles.modalHeader}>
                             <Text style={styles.modalTitle}>Create App</Text>
                             <TouchableOpacity onPress={() => setModalVisible(false)}>
-                                <X size={24} color="#6b7280" />
+                                <X size={24} color={colors.mutedForeground} />
                             </TouchableOpacity>
                         </View>
 
                         <TextInput
                             style={styles.input}
                             placeholder="App Name"
+                            placeholderTextColor={colors.mutedForeground}
                             value={newAppName}
                             onChangeText={setNewAppName}
                         />
                         <TextInput
                             style={[styles.input, styles.textArea]}
                             placeholder="Description"
+                            placeholderTextColor={colors.mutedForeground}
                             value={newAppDesc}
                             onChangeText={setNewAppDesc}
                             multiline
@@ -146,7 +150,7 @@ export const AppsScreen = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f9fafb',
+        backgroundColor: colors.background,
     },
     header: {
         flexDirection: 'row',
@@ -157,16 +161,16 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 28,
         fontWeight: 'bold',
-        color: '#111827',
+        color: colors.foreground,
     },
     addButton: {
-        backgroundColor: '#4f46e5',
+        backgroundColor: colors.primary,
         width: 44,
         height: 44,
         borderRadius: 22,
         justifyContent: 'center',
         alignItems: 'center',
-        shadowColor: '#4f46e5',
+        shadowColor: colors.primary,
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 8,
@@ -175,22 +179,21 @@ const styles = StyleSheet.create({
         padding: 20,
     },
     card: {
-        backgroundColor: 'white',
+        backgroundColor: colors.card,
         borderRadius: 16,
         padding: 16,
         marginBottom: 12,
         flexDirection: 'row',
         alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.05,
-        shadowRadius: 4,
+        // Minimal shadow for dark mode, or use border
+        borderWidth: 1,
+        borderColor: colors.border,
     },
     cardIcon: {
         width: 48,
         height: 48,
         borderRadius: 12,
-        backgroundColor: '#e0e7ff',
+        backgroundColor: 'rgba(16, 185, 129, 0.1)', // customized for dark theme
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 16,
@@ -201,12 +204,12 @@ const styles = StyleSheet.create({
     cardTitle: {
         fontSize: 16,
         fontWeight: '600',
-        color: '#1f2937',
+        color: colors.cardForeground,
         marginBottom: 4,
     },
     cardDesc: {
         fontSize: 14,
-        color: '#6b7280',
+        color: colors.mutedForeground,
     },
     center: {
         flex: 1,
@@ -218,7 +221,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     emptyText: {
-        color: '#9ca3af',
+        color: colors.mutedForeground,
         fontSize: 16,
         textAlign: 'center',
     },
@@ -228,11 +231,15 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.5)',
     },
     modalContent: {
-        backgroundColor: 'white',
+        backgroundColor: colors.richBlack, // or colors.background + border
         borderTopLeftRadius: 24,
         borderTopRightRadius: 24,
         padding: 24,
         minHeight: 300,
+        borderTopWidth: 1,
+        borderLeftWidth: 1,
+        borderRightWidth: 1,
+        borderColor: colors.border,
     },
     modalHeader: {
         flexDirection: 'row',
@@ -243,22 +250,24 @@ const styles = StyleSheet.create({
     modalTitle: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: '#111827',
+        color: colors.foreground,
     },
     input: {
-        backgroundColor: '#f3f4f6',
+        backgroundColor: colors.input,
         padding: 16,
         borderRadius: 12,
         marginBottom: 16,
         fontSize: 16,
-        color: '#1f2937',
+        color: colors.foreground,
+        borderWidth: 1,
+        borderColor: colors.border,
     },
     textArea: {
         height: 100,
         textAlignVertical: 'top',
     },
     createButton: {
-        backgroundColor: '#4f46e5',
+        backgroundColor: colors.primary,
         padding: 16,
         borderRadius: 12,
         alignItems: 'center',
