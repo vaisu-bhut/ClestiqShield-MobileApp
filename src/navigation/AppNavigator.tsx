@@ -8,6 +8,7 @@ import { ProfileScreen } from '../screens/ProfileScreen';
 import { AppsScreen } from '../screens/AppsScreen';
 import { AppDetailsScreen } from '../screens/AppDetailsScreen';
 import { LayoutDashboard, User, Box } from 'lucide-react-native';
+import { colors } from '../styles/colors';
 
 export type RootStackParamList = {
     Auth: undefined;
@@ -56,10 +57,12 @@ const MainNavigator = ({ onLogout }: { onLogout: () => void }) => (
     <Tab.Navigator
         screenOptions={{
             headerShown: false,
-            tabBarActiveTintColor: '#849bff',
-            tabBarInactiveTintColor: '#9ca3af',
+            tabBarActiveTintColor: colors.primary,
+            tabBarInactiveTintColor: colors.mutedForeground,
             tabBarStyle: {
-                borderTopWidth: 0,
+                backgroundColor: colors.background,
+                borderTopColor: colors.border,
+                borderTopWidth: 1,
                 elevation: 0,
                 shadowOpacity: 0,
                 height: 60,

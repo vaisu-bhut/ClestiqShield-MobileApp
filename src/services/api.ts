@@ -51,11 +51,11 @@ class ApiService {
         return data;
     }
 
-    async signup(email: string, password: string) {
+    async signup(email: string, password: string, fullName?: string) {
         const response = await fetch(`${API_BASE_URL}/auth/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password }),
+            body: JSON.stringify({ email, password, full_name: fullName }),
         });
         return this.handleResponse(response);
     }

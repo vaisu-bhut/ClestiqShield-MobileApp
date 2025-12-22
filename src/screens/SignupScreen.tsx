@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert, StatusBar } from 'react-native';
 import { api } from '../services/api';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../navigation/AppNavigator';
+import { colors } from '../styles/colors';
 
 type SignupScreenNavigationProp = NativeStackNavigationProp<AuthStackParamList, 'Signup'>;
 
@@ -11,6 +12,7 @@ export const SignupScreen = () => {
     const navigation = useNavigation<SignupScreenNavigationProp>();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -28,7 +30,7 @@ export const SignupScreen = () => {
         try {
             setLoading(true);
             setError('');
-            await api.signup(email, password);
+            await api.signup(email, password, name);
             Alert.alert('Success', 'Account created successfully! Please login.');
             navigation.navigate('Login');
         } catch (err: any) {
@@ -40,6 +42,7 @@ export const SignupScreen = () => {
 
     return (
         <View style={styles.container}>
+            <StatusBar barStyle="light-content" backgroundColor={colors.background} />
             <View style={styles.logoContainer}>
                 <Image
                     source={require('../../assets/icon.png')}
@@ -52,9 +55,17 @@ export const SignupScreen = () => {
 
             <View style={styles.form}>
                 <TextInput
+                    placeholder="Full Name"
+                    style={styles.input}
+                    placeholderTextColor={colors.mutedForeground}
+                    value={name}
+                    onChangeText={setName}
+                    autoCapitalize="words"
+                />
+                <TextInput
                     placeholder="Email"
                     style={styles.input}
-                    placeholderTextColor="#9ca3af"
+                    placeholderTextColor={colors.mutedForeground}
                     value={email}
                     onChangeText={setEmail}
                     autoCapitalize="none"
@@ -64,7 +75,7 @@ export const SignupScreen = () => {
                     placeholder="Password"
                     secureTextEntry
                     style={styles.input}
-                    placeholderTextColor="#9ca3af"
+                    placeholderTextColor={colors.mutedForeground}
                     value={password}
                     onChangeText={setPassword}
                 />
@@ -72,7 +83,7 @@ export const SignupScreen = () => {
                     placeholder="Confirm Password"
                     secureTextEntry
                     style={styles.input}
-                    placeholderTextColor="#9ca3af"
+                    placeholderTextColor={colors.mutedForeground}
                     value={confirmPassword}
                     onChangeText={setConfirmPassword}
                 />
@@ -98,7 +109,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#f3f4f6',
+        backgroundColor: colors.background,
         padding: 20,
     },
     logoContainer: {
@@ -113,12 +124,12 @@ const styles = StyleSheet.create({
     appName: {
         fontSize: 24,
         fontWeight: 'bold',
-        color: '#111827',
+        color: colors.foreground,
         marginTop: 10,
     },
     subtitle: {
         fontSize: 16,
-        color: '#6b7280',
+        color: colors.mutedForeground,
         marginTop: 4,
     },
     form: {
@@ -126,27 +137,28 @@ const styles = StyleSheet.create({
         maxWidth: 400,
     },
     input: {
-        backgroundColor: 'white',
+        backgroundColor: colors.input,
         padding: 15,
         borderRadius: 12,
         marginBottom: 16,
         borderWidth: 1,
-        borderColor: '#e5e7eb',
+        borderColor: colors.border,
         fontSize: 16,
+        color: colors.foreground,
     },
     button: {
-        backgroundColor: '#849bff',
+        backgroundColor: colors.primary,
         padding: 16,
         borderRadius: 12,
         alignItems: 'center',
-        shadowColor: '#849bff',
+        shadowColor: colors.primary,
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 8,
         marginTop: 8,
     },
     buttonText: {
-        color: 'white',
+        color: colors.primaryForeground,
         fontSize: 16,
         fontWeight: 'bold',
     },
@@ -154,7 +166,7 @@ const styles = StyleSheet.create({
         opacity: 0.7,
     },
     errorText: {
-        color: '#ef4444',
+        color: colors.error,
         marginBottom: 10,
         textAlign: 'center',
     },
@@ -163,7 +175,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     linkText: {
-        color: '#4f46e5',
+        color: colors.primary,
         fontSize: 16,
         fontWeight: '500',
     },

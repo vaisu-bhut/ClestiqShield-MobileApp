@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, StatusBar } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { api } from '../services/api';
+import { colors } from '../styles/colors';
 
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -39,6 +40,7 @@ export const LoginScreen = ({ onLogin }: { onLogin: () => void }) => {
 
     return (
         <View style={styles.container}>
+            <StatusBar barStyle="light-content" backgroundColor={colors.background} />
             <View style={styles.logoContainer}>
                 <Image
                     source={require('../../assets/icon.png')}
@@ -52,16 +54,17 @@ export const LoginScreen = ({ onLogin }: { onLogin: () => void }) => {
                 <TextInput
                     placeholder="Email"
                     style={styles.input}
-                    placeholderTextColor="#9ca3af"
+                    placeholderTextColor={colors.mutedForeground}
                     value={username}
                     onChangeText={setUsername}
                     autoCapitalize="none"
+                    keyboardType="email-address"
                 />
                 <TextInput
                     placeholder="Password"
                     secureTextEntry
                     style={styles.input}
-                    placeholderTextColor="#9ca3af"
+                    placeholderTextColor={colors.mutedForeground}
                     value={password}
                     onChangeText={setPassword}
                 />
@@ -87,7 +90,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#f3f4f6',
+        backgroundColor: colors.background,
         padding: 20,
     },
     logoContainer: {
@@ -98,11 +101,12 @@ const styles = StyleSheet.create({
         width: 100,
         height: 100,
         borderRadius: 20,
+        marginBottom: 10,
     },
     appName: {
         fontSize: 28,
         fontWeight: 'bold',
-        color: '#111827',
+        color: colors.foreground,
         marginTop: 10,
     },
     form: {
@@ -110,26 +114,27 @@ const styles = StyleSheet.create({
         maxWidth: 400,
     },
     input: {
-        backgroundColor: 'white',
+        backgroundColor: colors.input,
         padding: 15,
         borderRadius: 12,
         marginBottom: 16,
         borderWidth: 1,
-        borderColor: '#e5e7eb',
+        borderColor: colors.border,
         fontSize: 16,
+        color: colors.foreground,
     },
     button: {
-        backgroundColor: '#849bff',
+        backgroundColor: colors.primary,
         padding: 16,
         borderRadius: 12,
         alignItems: 'center',
-        shadowColor: '#849bff',
+        shadowColor: colors.primary,
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 8,
     },
     buttonText: {
-        color: 'white',
+        color: colors.primaryForeground,
         fontSize: 16,
         fontWeight: 'bold',
     },
@@ -137,7 +142,7 @@ const styles = StyleSheet.create({
         opacity: 0.7,
     },
     errorText: {
-        color: '#ef4444',
+        color: colors.error,
         marginBottom: 10,
         textAlign: 'center',
     },
@@ -146,7 +151,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     linkText: {
-        color: '#4f46e5',
+        color: colors.primary,
         fontSize: 16,
         fontWeight: '500',
     },

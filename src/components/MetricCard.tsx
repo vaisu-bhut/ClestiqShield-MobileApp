@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { ShieldAlert, Activity, DollarSign, AlertCircle, Cpu, LucideIcon } from 'lucide-react-native';
+import { colors } from '../styles/colors';
 
 const iconMap: Record<string, LucideIcon> = {
     AlertCircle,
@@ -22,7 +23,7 @@ export const MetricCard = ({ title, value, change, status, iconName }: MetricCar
     const Icon = iconMap[iconName] || Activity;
 
     // Simple color logic
-    const statusColor = status === 'good' ? '#10b981' : status === 'warning' ? '#f59e0b' : '#ef4444';
+    const statusColor = status === 'good' ? colors.success : status === 'warning' ? colors.warning : colors.error;
 
     return (
         <View style={styles.card}>
@@ -32,7 +33,7 @@ export const MetricCard = ({ title, value, change, status, iconName }: MetricCar
             <View>
                 <Text style={styles.title}>{title}</Text>
                 <Text style={styles.value}>{value}</Text>
-                <Text style={[styles.change, { color: status === 'critical' ? '#ef4444' : '#6b7280' }]}>
+                <Text style={[styles.change, { color: status === 'critical' ? colors.error : colors.mutedForeground }]}>
                     {change} from last week
                 </Text>
             </View>
@@ -42,17 +43,15 @@ export const MetricCard = ({ title, value, change, status, iconName }: MetricCar
 
 const styles = StyleSheet.create({
     card: {
-        backgroundColor: 'white',
+        backgroundColor: colors.card,
         padding: 16,
         borderRadius: 16,
         marginBottom: 12,
         flexDirection: 'row',
         alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 8,
-        elevation: 2,
+        // minimal shadow/border for dark mode
+        borderWidth: 1,
+        borderColor: colors.border,
         gap: 16,
     },
     iconContainer: {
@@ -61,14 +60,14 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 14,
-        color: '#6b7280',
+        color: colors.mutedForeground,
         marginBottom: 4,
         fontWeight: '500',
     },
     value: {
         fontSize: 24,
         fontWeight: '700',
-        color: '#111827',
+        color: colors.foreground,
     },
     change: {
         fontSize: 12,

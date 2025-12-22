@@ -1,10 +1,12 @@
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Modal, TextInput, ActivityIndicator, Alert, Clipboard } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Modal, TextInput, ActivityIndicator, Alert, StatusBar } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ActionSheetIOS, Platform } from 'react-native'; // Optional if needed for better alerts? standard Alert is fine
 import { Key, Trash2, ArrowLeft, Copy, Plus, X, Edit2 } from 'lucide-react-native';
 import { api } from '../services/api';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useEffect, useState } from 'react';
+import * as Clipboard from 'expo-clipboard';
+import { colors } from '../styles/colors';
 
 export const AppDetailsScreen = () => {
     const route = useRoute<any>();
@@ -131,8 +133,8 @@ export const AppDetailsScreen = () => {
         );
     };
 
-    const copyToClipboard = (text: string) => {
-        Clipboard.setString(text);
+    const copyToClipboard = async (text: string) => {
+        await Clipboard.setStringAsync(text);
         Alert.alert('Copied', 'API Key copied to clipboard');
     };
 
@@ -140,14 +142,14 @@ export const AppDetailsScreen = () => {
         <View style={styles.card}>
             <View style={styles.cardHeader}>
                 <View style={styles.keyIcon}>
-                    <Key size={20} color="#849bff" />
+                    <Key size={20} color={colors.primary} />
                 </View>
                 <View style={styles.keyInfo}>
                     <Text style={styles.keyName}>{item.name}</Text>
                     <Text style={styles.keyPrefix}>Prefix: {item.key_prefix}...</Text>
                 </View>
                 <TouchableOpacity onPress={() => handleRevokeKey(item.id)} style={styles.revokeButton}>
-                    <Trash2 size={20} color="#ef4444" />
+                    <Trash2 size={20} color={colors.error} />
                 </TouchableOpacity>
             </View>
         </View>
@@ -155,13 +157,14 @@ export const AppDetailsScreen = () => {
 
     return (
         <SafeAreaView style={styles.container} edges={['top']}>
+            <StatusBar barStyle="light-content" backgroundColor={colors.background} />
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-                    <ArrowLeft size={24} color="#111827" />
+                    <ArrowLeft size={24} color={colors.foreground} />
                 </TouchableOpacity>
                 <Text style={styles.title}>{currentAppDetails ? currentAppDetails.name : appName}</Text>
                 <TouchableOpacity onPress={() => setEditModalVisible(true)} style={styles.backButton}>
-                    <Edit2 size={24} color="#4f46e5" />
+                    <Edit2 size={24} color={colors.primary} />
                 </TouchableOpacity>
             </View>
 
@@ -175,7 +178,7 @@ export const AppDetailsScreen = () => {
 
             {loading ? (
                 <View style={styles.center}>
-                    <ActivityIndicator size="large" color="#4f46e5" />
+                    <ActivityIndicator size="large" color={colors.primary} />
                 </View>
             ) : (
                 <FlatList
@@ -216,7 +219,7 @@ export const AppDetailsScreen = () => {
                                         setCreatedKeySecret(null);
                                         setModalVisible(false);
                                     }}>
-                                        <X size={24} color="#6b7280" />
+                                        <X size={24} color={colors.mutedForeground} />
                                     </TouchableOpacity>
                                 </View>
                                 <Text style={styles.warningText}>
@@ -225,7 +228,7 @@ export const AppDetailsScreen = () => {
                                 <View style={styles.secretBox}>
                                     <Text style={styles.secretText}>{createdKeySecret}</Text>
                                     <TouchableOpacity onPress={() => copyToClipboard(createdKeySecret)}>
-                                        <Copy size={20} color="#4f46e5" />
+                                        <Copy size={20} color={colors.primary} />
                                     </TouchableOpacity>
                                 </View>
                                 <TouchableOpacity
@@ -243,13 +246,14 @@ export const AppDetailsScreen = () => {
                                 <View style={styles.modalHeader}>
                                     <Text style={styles.modalTitle}>Create API Key</Text>
                                     <TouchableOpacity onPress={() => setModalVisible(false)}>
-                                        <X size={24} color="#6b7280" />
+                                        <X size={24} color={colors.mutedForeground} />
                                     </TouchableOpacity>
                                 </View>
 
                                 <TextInput
                                     style={styles.input}
                                     placeholder="Key Name (e.g. Production)"
+                                    placeholderTextColor={colors.mutedForeground}
                                     value={newKeyName}
                                     onChangeText={setNewKeyName}
                                 />
@@ -279,7 +283,7 @@ export const AppDetailsScreen = () => {
                         <View style={styles.modalHeader}>
                             <Text style={styles.modalTitle}>Edit Application</Text>
                             <TouchableOpacity onPress={() => setEditModalVisible(false)} style={styles.closeButton}>
-                                <X size={24} color="#6b7280" />
+                                <X size={24} color={colors.mutedForeground} />
                             </TouchableOpacity>
                         </View>
 
@@ -288,6 +292,7 @@ export const AppDetailsScreen = () => {
                             style={styles.input}
                             value={editName}
                             onChangeText={setEditName}
+                            placeholderTextColor={colors.mutedForeground}
                         />
 
                         <Text style={styles.inputLabel}>Description</Text>
@@ -296,6 +301,7 @@ export const AppDetailsScreen = () => {
                             value={editDesc}
                             onChangeText={setEditDesc}
                             multiline
+                            placeholderTextColor={colors.mutedForeground}
                         />
 
                         <TouchableOpacity
@@ -315,7 +321,7 @@ export const AppDetailsScreen = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f9fafb',
+        backgroundColor: colors.background,
     },
     header: {
         flexDirection: 'row',
@@ -330,7 +336,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 24,
         fontWeight: 'bold',
-        color: '#111827',
+        color: colors.foreground,
     },
     sectionHeader: {
         flexDirection: 'row',
@@ -342,10 +348,10 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 18,
         fontWeight: '600',
-        color: '#374151',
+        color: colors.mutedForeground,
     },
     addButton: {
-        backgroundColor: '#4f46e5',
+        backgroundColor: colors.primary,
         paddingHorizontal: 16,
         paddingVertical: 8,
         borderRadius: 20,
@@ -362,12 +368,12 @@ const styles = StyleSheet.create({
         padding: 20,
     },
     card: {
-        backgroundColor: 'white',
+        backgroundColor: colors.card,
         borderRadius: 12,
         padding: 16,
         marginBottom: 12,
         borderWidth: 1,
-        borderColor: '#e5e7eb',
+        borderColor: colors.border,
     },
     cardHeader: {
         flexDirection: 'row',
@@ -377,7 +383,7 @@ const styles = StyleSheet.create({
         width: 40,
         height: 40,
         borderRadius: 10,
-        backgroundColor: '#f3f4f6',
+        backgroundColor: 'rgba(16, 185, 129, 0.1)',
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 12,
@@ -388,12 +394,12 @@ const styles = StyleSheet.create({
     keyName: {
         fontSize: 16,
         fontWeight: '600',
-        color: '#1f2937',
+        color: colors.foreground,
         marginBottom: 2,
     },
     keyPrefix: {
         fontSize: 13,
-        color: '#6b7280',
+        color: colors.mutedForeground,
         fontFamily: 'monospace',
     },
     center: {
@@ -406,7 +412,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     emptyText: {
-        color: '#9ca3af',
+        color: colors.mutedForeground,
         fontSize: 14,
         textAlign: 'center',
     },
@@ -416,7 +422,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.5)',
     },
     bottomSheet: {
-        backgroundColor: 'white',
+        backgroundColor: colors.richBlack,
         borderTopLeftRadius: 24,
         borderTopRightRadius: 24,
         padding: 24,
@@ -426,6 +432,10 @@ const styles = StyleSheet.create({
         shadowRadius: 12,
         elevation: 10,
         minHeight: 300,
+        borderTopWidth: 1,
+        borderLeftWidth: 1,
+        borderRightWidth: 1,
+        borderColor: colors.border,
     },
     closeButton: {
         padding: 4,
@@ -438,7 +448,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#ef4444',
+        backgroundColor: colors.error,
         padding: 16,
         borderRadius: 12,
         gap: 8,
@@ -463,18 +473,20 @@ const styles = StyleSheet.create({
     modalTitle: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: '#111827',
+        color: colors.foreground,
     },
     input: {
-        backgroundColor: '#f3f4f6',
+        backgroundColor: colors.input,
         padding: 16,
         borderRadius: 12,
         marginBottom: 16,
         fontSize: 16,
-        color: '#1f2937',
+        color: colors.foreground,
+        borderWidth: 1,
+        borderColor: colors.border,
     },
     createButton: {
-        backgroundColor: '#4f46e5',
+        backgroundColor: colors.primary,
         padding: 16,
         borderRadius: 12,
         alignItems: 'center',
@@ -489,7 +501,7 @@ const styles = StyleSheet.create({
         opacity: 0.7,
     },
     warningText: {
-        color: '#d97706',
+        color: colors.warning,
         marginBottom: 16,
         fontSize: 14,
         lineHeight: 20,
@@ -498,21 +510,21 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        backgroundColor: '#f3f4f6',
+        backgroundColor: colors.input,
         padding: 16,
         borderRadius: 12,
         marginBottom: 24,
         borderWidth: 1,
-        borderColor: '#e5e7eb',
+        borderColor: colors.border,
     },
     secretText: {
         fontFamily: 'monospace',
         fontSize: 16,
-        color: '#1f2937',
+        color: colors.foreground,
         flex: 1,
     },
     doneButton: {
-        backgroundColor: '#10b981',
+        backgroundColor: colors.primary,
         padding: 16,
         borderRadius: 12,
         alignItems: 'center',
@@ -529,7 +541,7 @@ const styles = StyleSheet.create({
     inputLabel: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#374151',
+        color: colors.mutedForeground,
         marginBottom: 8,
     },
 });
